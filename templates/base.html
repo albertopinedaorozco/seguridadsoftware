@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    	<title>{% block title %}
+     			    Seguridad del software
+     		    {% endblock %}
+    	</title>
+
+
+<script src="{% static 'js/tinymce/tinymce.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/tinymce/custom.js' %}" ></script>
+
+<!-- libreria chart js-->
+<script  src="{% static 'js/Chart.bundle.min.js' %}" ></script>
+<script  src="{% static 'js/Chart.min.js' %}" ></script>
+
+      <link  rel="stylesheet" type="text/css" href="{% static 'site/normalize.css' %}" >
+      <link  rel="stylesheet" type="text/css" href="{% static 'site/estilo.css' %}">  
+        <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" type="text/css" href="{% static 'site/bootstrapmin.css' %}" > 
+
+      <!-- Optional theme -->
+      <link rel="stylesheet" type="text/css" href="{% static 'site/bootstrap-thememin.css' %}" > 
+
+</head>
+<body>
+
+  <div id="container" >
+
+  <header>
+					
+			 <figure>
+               
+              <a href="{% url 'question_recents_list' %}"> 
+                <img  src="{% static 'site/preguntamosanterior.png' %}"  alt="Site Logo" width="200px" height="100px">
+                <!--  <img  src="{% static 'site/preguntamos3.png' %}"  alt="Site Logo" width="200px" height="100px"> -->
+              </a>
+      </figure>
+      
+			<nav>
+        <ul>
+          {% if user.is_authenticated %}
+                  <li><a href="{% url 'export_registros_csv_list' %}">Descargar usuarios</a></li>
+                  <li><a href="#">Cifrado/descifrado</a>
+                    <ul>
+                      <li><a href="{% url 'genera_clave' %}">Genera clave</a></li>
+                      <li><a href="{% url 'aes_encriptar' %}">Encriptar</a></li>
+                      <li><a href="{% url 'aes_desencriptar' %}">Desencriptar</a></li>
+                    </ul>
+                  </li>
+
+                  <li><a href="#">Firma/validación</a></li>
+                  <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
+                  <li style="margin-left: 1em;"><strong>Usuario: {{user.username}}</strong></li>
+          {% else %}
+              <li><a href="{% url 'login' %}">Iniciar sesión</a>
+              <li><a href="{% url 'people_colaborador_create' %}">Quiero registrarme</a></li>
+          {% endif %}
+                        
+
+                    </li>
+				</ul>
+
+
+			</nav> 
+
+    	
+    </header>
+
+    
+  
+      <div id="contenido" class="container">
+
+          <div class="row" id="rowprincipal">
+            
+            <div class="col-md-9" id="colbase"> <!-- Contenido especifico de la pagina -->
+                  
+                     <div class="row">
+                         <section  id="hacepreguntas">
+                            {% block content %}
+                          This is default content!
+                        {% endblock %}
+                      </section>
+
+                     </div>
+
+                     <div class="row">
+                        <section  id ="preguntasrecientes">
+                      
+                            {% block content2 %}
+                          
+                          {% endblock %}
+                
+                        </section>
+                     </div>
+                          
+                  
+
+            </div>
+            
+            <div class="col-md-3" id="colaside">
+                             
+             </div>
+
+          </div>
+
+
+    </div> <!-- fin de div contenido -->
+
+        
+  </div> <!-- fin de div #container -->
+<footer>
+      <div id="up">
+        <p> <strong>Universidad del Norte </strong></p>
+        <p> <strong>Modulo seguridad del software</strong></p>
+      </div>
+      <div id="down">
+        <p>Yalitza Barceló</p>
+        <p>Pamela</p>
+        <p>Daniel Herrera</p>
+        <p>Fireman Pineda</p>
+        <p>© {% now 'Y'  %} All Rights Reserved</p>
+      </div>
+        
+</footer>
+  
+
+</div> <!-- div container mas externo -->
+<!-- Latest compiled and minified JavaScript -->
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>  -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'site/bootstrapmin.js' %}" ></script>
+
+<script language="Javascript">
+ // document.oncontextmenu = function(){return false}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+{% extends parent_template|default:"people/base_people.html" %}
+
+{% block title %}
+	{{ block.super }} - Preguntas 
+{% endblock %}
+
+{% block content %}
+         
+                  <div class="page-header">
+                      <h2>Usuario registrado</h2>
+                      <h3><small>¡ Gracias por registrarte en este sitio web !</small></h3>
+                      <h3><small>Te invito a iniciar sesión</small></h3>
+                    </div>
+              
+                 <article class="panel panel-success">
+                    <div class="panel-body">
+                      
+                      <div class="row">
+                        <div class="col-md-2">
+                            <div>
+                               {{ colaborador.admin_foto }}
+                            </div>
+                        </div>
+                         <div class="col-md-7">
+                            <p><strong>Nombres:</strong>  {{ colaborador.user.first_name }}</p>
+                            <p><strong>Apellidos:</strong> {{ colaborador.user.last_name }}</p>
+                            <p><strong>Email:</strong> {{ colaborador.user.email }}</p>
+                          
+                        </div>
+                         
+                      </div>
+                       
+                    </div>
+                 
+                </article>
+                  
+           
+                        
+
+                        
+                   
+
+{% endblock %}
+

@@ -1,0 +1,44 @@
+{% extends parent_template|default:"question/base_question.html" %}
+
+{% block title %}
+	{{ block.super }} - Colaborador 
+{% endblock %}
+
+{% block content %}
+               <article class="panel panel-warning">
+	                     <div class="panel-heading">
+	                        <h3 class="panel-title">
+	                        	Datos del usuario	 
+	                        	<span class="required_notification">Los datos marcados con * son requeridos</span>                                                   
+	                        </h3>
+
+	                        
+	                     </div> 
+	                     <div class="panel-body">
+		                      <div class="row">
+		                            <div class="col-md-9">
+			                            <form  action="{{ colaborador.get_absolute_url }}"  method="post" enctype="multipart/form-data" class="contact_form">
+			                               <div>
+				                               <ul>
+											       {% csrf_token %}
+                            
+											       {{ form.as_ul }}
+                             {{ user_form.as_ul }}
+                             {{ form.errors }}
+											       
+											       
+											    </ul>
+											<button id="accion" type="submit" class="btn btn-success">Registrarme</button>
+										   </div>
+										 </form>
+			                        </div>
+			                       
+			                         
+		                         
+		                      </div>
+	                        
+	                    </div>
+                 
+                </article>
+                 
+{% endblock %}

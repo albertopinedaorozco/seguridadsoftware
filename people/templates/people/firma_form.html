@@ -1,0 +1,51 @@
+{% extends parent_template|default:"people/base_people.html" %}
+
+{% block title %}
+	{{ block.super }} - Firma 
+{% endblock %}
+
+{% block content %}
+              
+                
+                <article class="panel panel-{% if mensaje %}success{% else %}info{% endif %}">
+	                     <div class="panel-heading">
+	                        <h3 class="panel-title">
+	                        	Cargue de archivos para	<strong>{% if mensaje %}Firmar documento{% else %}Validar firma{% endif %}</strong><span class="required_notification">El campo es obligatorio</span>                                                   
+	                        </h3>
+	                         
+	                     </div> 
+	                     <div class="panel-body">
+		                      <div class="row">
+		                            <div class="col-md-12">
+			                            <form  action="{{ pregunt.get_absolute_url }}"  method="post" enctype="multipart/form-data" class="contact_form">
+			                            	<div>
+			                            		<ul>
+											       {% csrf_token %}
+                             {{ form.as_ul }}
+                             
+                             <p style="color: red;">{{error}}</p>
+											       
+											       
+										       </ul>
+                            {% if user.is_authenticated %} 
+										              <button id="accion"  class="btn btn-{% if mensaje %}success{% else %}info{% endif %}" type="submit">Cargar archivo y {% if mensaje %}firmar{% else %}verificar firma{% endif %}</button>
+										         {% else %}
+                                  <p class="mensaje_P">Debe estar registrado para cargar archivos <a href="{% url 'people_colaborador_create' %}">aquí.</a></p>
+                             {% endif %}
+                        </div>
+										 </form>
+			                        </div>
+			                       
+			                         
+		                         
+		                      </div>
+	                        
+	                       
+
+	                    </div>
+                 
+                </article>
+                    
+
+{% endblock %}
+

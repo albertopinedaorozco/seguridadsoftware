@@ -6,6 +6,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
+from .models import Firma
+
 class ColaboradorForm(forms.ModelForm):
 	class Meta:
 		model = Colaborador
@@ -34,3 +36,10 @@ class EditProfileForm(UserChangeForm):
 		model = User
 		fields = ['first_name', 'last_name', 'email','password']
         
+
+
+
+class FirmaForm(forms.ModelForm):
+	class Meta:
+		model = Firma
+		fields = '__all__'

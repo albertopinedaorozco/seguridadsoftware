@@ -38,3 +38,10 @@ class Colaborador(models.Model):
 		
 	post_save.connect(create_profile, sender=User)
 
+
+class Firma(models.Model):
+    fileupload = models.FileField('Cargar archivo .txt con los datos',upload_to = 'archivos/')
+    
+    def __str__(self):
+        return self.id
+

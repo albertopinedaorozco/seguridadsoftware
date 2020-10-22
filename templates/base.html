@@ -50,7 +50,15 @@
                     </ul>
                   </li>
 
-                  <li><a href="#">Firma/validación</a></li>
+                  <li><a href="#">Firma/validación</a>
+                    <ul>
+                      <li><a href="{% url 'genera_llaves_publica_privada' %}">Generar ambas llaves</a></li>
+                      <li><a href="{% url 'descargar_llave_publica' %}">Descargar llave publica</a></li>
+                      <li><a href="{% url 'descargar_llave_privada' %}">Descargar llave privada</a></li>
+                      <li><a href="{% url 'firmar_documento' %}">Firmar documento</a></li>
+                      <li><a href="{% url 'valida_firma' %}">Validación de firma</a></li>
+                    </ul>
+                  </li>
                   <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
                   <li style="margin-left: 1em;"><strong>Usuario: {{user.username}}</strong></li>
           {% else %}
@@ -71,6 +79,16 @@
     
   
       <div id="contenido" class="container">
+        {% for message in messages %}
+        <div class="container-fluid p-0">
+          <div class="alert {{ message.tags }} alert-dismissible" role="alert" >
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Nuevo mensaje</strong>: {{ message }}
+          </div>
+        </div>
+        {% endfor %}
 
           <div class="row" id="rowprincipal">
             
@@ -116,10 +134,6 @@
         <p> <strong>Modulo seguridad del software</strong></p>
       </div>
       <div id="down">
-        <p>Yalitza Barceló</p>
-        <p>Pamela</p>
-        <p>Daniel Herrera</p>
-        <p>Fireman Pineda</p>
         <p>© {% now 'Y'  %} All Rights Reserved</p>
       </div>
         

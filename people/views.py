@@ -1,8 +1,8 @@
 from django.shortcuts import render,get_object_or_404, redirect
 from django.views.generic import View
 from .models import Colaborador
-from .forms import ColaboradorForm,UserForm,EditProfileForm
-
+from .forms import ColaboradorForm,UserForm,EditProfileForm, FirmaForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.contrib.auth.models import User
 
@@ -14,16 +14,177 @@ from django.contrib.auth import update_session_auth_hash
 from django.http import HttpResponse
 import csv
 
+import mimetypes
+import os.path
+from django.core.files.storage import default_storage
+
 from django.contrib.auth.decorators import login_required
 import mimetypes
+#usado para encriptación AES
 from cryptography.fernet import Fernet
 
+#usado para encriptacion asimetrica
+import Crypto
+from Crypto.PublicKey import RSA
+import binascii
+from Crypto.Hash import MD5#, SHA256
+from Crypto.Signature import PKCS1_v1_5
+
+#messages
+from django.contrib import messages
+
+private_keyy = None
+public_keyy = None
+signature = None
+
 @login_required
-def genera_clave(request):
+def genera_clave(request): #genera clave Encriptacion AES (Encriptación simetrico)
 	clave = Fernet.generate_key()
 	response = HttpResponse(clave, content_type='text/liquid')
 	response['Content-Disposition'] = 'attachment; filename="clave.key"'
 	return response
+
+@login_required
+def genera_llaves_publica_privada(request): #encriptacion asimetrica
+	global private_keyy
+	global public_keyy
+
+	random_generator = Crypto.Random.new().read
+	private_keyy = RSA.generate(1024, random_generator)
+	public_keyy = private_keyy.publickey()
+	messages.success(request, 'LLaves publica y privada generadas con éxito')
+	return redirect('question_recents_list')
+
+@login_required
+def descargar_llave_publica(request):
+	if public_keyy is not None:
+		public_key_ascci = public_keyy.exportKey(format='DER')
+		public_key_ascci = binascii.hexlify(public_key_ascci).decode('utf8')
+
+		response = HttpResponse(public_key_ascci, content_type='text/plain')
+		response['Content-Disposition'] = 'attachment; filename="clave_publica.txt"'
+		return response
+	else:
+		messages.error(request, 'Por favor primero genere las llaves publica y privada en el menú')
+		return redirect('question_recents_list')
+
+@login_required	
+def descargar_llave_privada(request):
+	if private_keyy is not None:
+		private_key_ascci = private_keyy.exportKey(format='DER')
+		private_key_ascci = binascii.hexlify(private_key_ascci).decode('utf8')
+
+		response = HttpResponse(private_key_ascci, content_type='text/plain')
+		response['Content-Disposition'] = 'attachment; filename="clave_privada.txt"'
+		return response
+	else:
+		messages.error(request, 'Por favor primero genere las llaves publica y privada en el menú')
+		return redirect('question_recents_list')
+
+class FirmarDocumento(LoginRequiredMixin, View):
+	def get(self, request):
+		preForm = FirmaForm()
+		mensaje = "Firmar"
+		return render(request,'people/firma_form.html', {'form': preForm, 'mensaje': mensaje})
+
+		
+	def post(self, request):
+		global signature
+		bound_form = FirmaForm(request.POST, request.FILES)
+
+		if bound_form.is_valid():
+			if private_keyy is not None:
+				new_object = bound_form.save(commit=False)
+				new_object.save()
+				#print(new_object.key)
+
+				# el archivo que se quiere encriptar
+				my_file=request.FILES['fileupload']
+				BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+				media_path = os.path.join(BASE_DIR,'media/archivos/')
+				full_path=os.path.join(media_path,my_file.name)
+				#print(full_path)
+
+				filedata = default_storage.open(full_path, 'r')
+				data = filedata.read()
+				filedata.close()
+				#print(data)
+				#priv_key = RSA.importKey(private_keyy)
+
+				signer = PKCS1_v1_5.new(private_keyy)
+				md5_object = MD5.new()
+				print("valor de md5 ", md5_object)
+				print("signer ", signer)
+				md5_object.update(data.encode())
+				signature = signer.sign(md5_object)
+				#print("La firma es ", signature)
+
+				messages.success(request, f'Archivo firmado con éxito, la firma es: {signature}')
+				return redirect('question_recents_list')
+				# encrypted_data = f.encrypt(data.encode())
+				# response = HttpResponse(encrypted_data, content_type='text/plain')
+				# response['Content-Disposition'] = 'attachment; filename="archivoencriptado.txt"'
+				# return response
+				#return render(request, 'question/index.html')
+			else:
+				messages.error(request, f'Por favor primero genere las llaves publica y privada en el menú, y luego puede firmar el documento')
+				return redirect('question_recents_list')
+		else:
+			return render(request,'people/firma_form.html',{'form': bound_form,})
+
+class ValidarFirma(LoginRequiredMixin, View):
+	def get(self, request):
+		preForm = FirmaForm()
+		mensaje = ""
+		return render(request,'people/firma_form.html', {'form': preForm, 'mensaje': mensaje})
+
+		
+	def post(self, request):
+		bound_form = FirmaForm(request.POST, request.FILES)
+
+		if bound_form.is_valid():
+			if private_keyy is not None:
+				new_object = bound_form.save(commit=False)
+				new_object.save()
+				#print(new_object.key)
+
+				# el archivo que se quiere encriptar
+				my_file=request.FILES['fileupload']
+				BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+				media_path = os.path.join(BASE_DIR,'media/archivos/')
+				full_path=os.path.join(media_path,my_file.name)
+				#print(full_path)
+
+				filedata = default_storage.open(full_path, 'r')
+				data = filedata.read()
+				filedata.close()
+				#print(data)
+				#priv_key = RSA.importKey(private_keyy)
+
+				signer = PKCS1_v1_5.new(public_keyy)
+				md5_object = MD5.new()
+				print("valor de md5 ", md5_object)
+				print("signer ", signer)
+				md5_object.update(data.encode())
+				result = signer.verify(md5_object, signature)
+				#print("La firma es ", signature)
+				if result:
+					messages.success(request, f'¡¡ FIRMA AUTENTICADA CON ÉXITO !!')
+				else:
+					messages.warning(request, f'La firma no se pudo autenticar')
+
+				return redirect('question_recents_list')
+				# encrypted_data = f.encrypt(data.encode())
+				# response = HttpResponse(encrypted_data, content_type='text/plain')
+				# response['Content-Disposition'] = 'attachment; filename="archivoencriptado.txt"'
+				# return response
+				#return render(request, 'question/index.html')
+			else:
+				messages.error(request, f'Por favor primero genere las llaves publica y privada en el menú, y luego puede firmar el documento y validar la firma')
+				return redirect('question_recents_list')
+		else:
+			return render(request,'people/firma_form.html',{'form': bound_form,})
+		
 
 @login_required
 def export_registros_csv(request):

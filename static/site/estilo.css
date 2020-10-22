@@ -20,7 +20,7 @@ header{
 	background: #D84C4C; /*#D00308 ; #AF2F2F*/
 	overflow: hidden;
 	margin: 0px;
-	height: 200px;
+	height: 240px;
 }
 
 #hacepreguntas{
@@ -197,7 +197,7 @@ figure img{
 	float: left;
 	margin-left: 7em;
 	margin-top: 1.4em;
-	border-radius: 20px;
+	border-radius: 5px;
 }
 
 #logocbn{
